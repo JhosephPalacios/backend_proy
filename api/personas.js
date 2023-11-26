@@ -41,7 +41,7 @@ ruta.post('/modificar', async (req, res) => {
     res.status(200).json(persona)
 })
 
-ruta.put('/modificar2', async (req, res) => {
+ruta.put('/modificarUsu', async (req, res) => {
     const id = req.query.id;
     const datosModificados = req.body;
     
