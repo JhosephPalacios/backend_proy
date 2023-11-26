@@ -3,7 +3,7 @@ const bodyParser = require("body-parser")
 const path = require('path');
 
 // require
-const prueba = require('./api/prueba')
+const test = require('./api/test')
 const personas = require('./api/personas')
 const libros = require('./api/libros')
 const reservas = require('./api/reservas')
@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, './static')));
 app.use(bodyParser.json({limit: '50mb'}));
 
 // use
-app.use('/api/prueba',prueba)
+app.use('/api/test',test)
 app.use('/api/personas',personas)
 app.use('/api/libros',libros)
 app.use('/api/reservas',reservas)
