@@ -48,3 +48,6 @@ copy 2(id,att2,att3,att4) from 'C:\"ruta"\2.csv' DELIMITTER ';' CSV HEADER;
 3. mostrar data
 curl -X GET -H "Content-Type:application/json" http://localhost:xxxx/api/****/d1
 (se debe crear las relaciones previante en 'models')
+
+select * from "tabla" where id = 35
+SELECT  *  FROM  "TABLA" WHERE nombres = 'Ricardo';
