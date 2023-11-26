@@ -1114,6 +1114,17 @@ module.exports = {
         descripcion: "Phasellus in felis. Donec semper sapien a libero. Nam dui.",
         imagen: "http://dummyimage.com/163x190.png/cc0000/ffffff",
         contador: 0
+      },
+      {
+        titulo: "Nuevo Libro de Aventuras",
+        autor: "Alice Escritora",
+        isbn: "123456789-0",
+        editorial: "Libros Fantásticos",
+        topicos: "aventura fantasía",
+        tipo: "novela",
+        descripcion: "Una emocionante historia llena de giros inesperados y mundos mágicos",
+        imagen: "http://dummyimage.com/210x156.png/5fa2dd/ffffff",
+        contador: 0
       }
     ]
       

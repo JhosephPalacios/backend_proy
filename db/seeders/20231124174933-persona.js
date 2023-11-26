@@ -47,6 +47,26 @@ module.exports = {
         correo: "user2@ulima.edu.pe",
         contrasenha: "user2",
         foto: "/gareca.png"
+      },
+      {
+        tipo: "user",
+        nombres: "Maria",
+        apellidos: "Gomez",
+        tipo_documento: "dni",
+        nro_documento: "70293902",
+        correo: "Maria_Gomez@hotmail.com",
+        contrasenha: "maria123",
+        foto: "/Maria.png"
+      },
+      {
+        tipo: "user",
+        nombres: "Jose",
+        apellidos: "Mendoza",
+        tipo_documento: "dni",
+        nro_documento: "69482049",
+        correo: "Jose-Mendoza@hotmail.com",
+        contrasenha: "josemendoza",
+        foto: "/Jose.png"
       }
     ]
     
