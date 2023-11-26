@@ -1,148 +1,192 @@
-const express = require('express');
-const ruta = express.Router();
-const db = require('../db/models/index.js');
+const express = require('express')
+const ruta = express.Router()
+const db = require('../db/models/index.js')
 const { Op } = require("sequelize");
 
-// Ruta para realizar búsquedas avanzadas de libros con filtros y paginación
 ruta.get('/busqueda', async (req, res) => {
-    // Extraer parámetros de la consulta
-    const { keyword = '', type = '', filters = [], page = '' } = req.query;
-    const pageSize = 5;
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
 
-    // Realizar consulta a la base de datos con Sequelize
-    const libros = await db.libro.findAll({
+    // Obtener parametros de busqueda
+    let obj = req.query
+    let keyword = obj.keyword != '' ? obj.keyword : ''
+    let type = obj.type != '' ? obj.type : ''
+    let filters = obj.filters != '' ? obj.filters.split(',') : []
+
+    let page = obj.page != '' ? obj.page : '' // de mi req llamos a despues del "?"
+    let pageSize = 5
+    // Necesito saber desde donde inicia la pagina y donde 
+    let start = (page - 1) * pageSize // algoritmo para saber el punto de inicio
+    let end = start + pageSize
+
+    console.log(req.query)
+    console.log(filters)
+
+    // Realizar consulta se libros segun parametros, incluyendo reservas
+    let libros = await db.libro.findAll({
         order: [['id', 'ASC']],
         where: {
-            // Condición OR: al menos una de las condiciones debe ser verdadera
             [Op.or]: {
-                // Condición para el campo 'titulo'
-                titulo: { [Op.iLike]: filters.includes('titulo') ? `%${keyword}%` : 'título_default' },
-                // Condición para el campo 'autor'
-                autor: { [Op.iLike]: filters.includes('autor') ? `%${keyword}%` : 'autor_default' },
-                // Condición para el campo 'topicos'
-                topicos: { [Op.iLike]: filters.includes('genero') ? `%${keyword}%` : 'género_default' },
-                // Condición para el campo 'isbn'
-                isbn: { [Op.iLike]: filters.includes('isbn') ? `%${keyword}%` : 'isbn_default' },
-            },
-            // Condición para el campo 'tipo'
-            tipo: { [Op.iLike]: `%${type}%` }
+                titulo: {
+                    [Op.iLike]: filters.includes('titulo') ? `%${keyword}%` : 'sdjafdjhbkfalhblhb'
+                },
+                autor: {
+                    [Op.iLike]: filters.includes('autor') ? `%${keyword}%` : '&&&&&&&&&&'
+                },
+                topicos: {
+                    [Op.iLike]: filters.includes('genero') ? `%${keyword}%` : '&&&&&&&.l.&&&&&'
+                },
+                isbn: {
+                    [Op.iLike]: filters.includes('isbn') ? `%${keyword}%` : '&&&&&°-°&&&&&&&&&'
+                },
+            }
+            ,
+            tipo: {
+                [Op.iLike]: `%${type}%`
+            }
         },
         include: {
-            // Incluir información de reservas
             model: db.reserva,
             as: 'reservado',
             attributes: ['id', 'fecha_final'],
             order: [['id', 'DESC']]
         }
-    });
+    })
 
-    // Procesar los resultados y agregar información adicional
-    const currentDate = new Date();
-    const response = libros.map(libro => ({
-        ...libro.get({ plain: true }),
-        disponible: libro.reservado.some(reserva => new Date(reserva.fecha_final) > currentDate)
-    })).slice(start, end);
 
-    // Enviar respuesta JSON con la información paginada
+    // Calcular si el libro esta disponible o no
+    let rpta = []
+    let hoy = new Date(obtenerFechaActual())
+    libros.forEach(item => {
+        let disponibilidad = true;
+        console.log(item.id, item.titulo)
+        if (item.reservado) {
+            //item.reservado = item.reservado.sort((a, b) => b.id - a.id);
+            item.reservado.forEach(i => {
+                console.log(" ", i.id, i.fecha_final)
+                if (new Date(i.fecha_final) > hoy) {
+                    disponibilidad = false
+                }
+            })
+            console.log("   Disponible: ", disponibilidad)
+        }
+        rpta.push({ ...item.get({ plain: true }), disponible: disponibilidad })
+    })
+
+    // PARA LA PAGINACION
+    // libros == data
+    const totalItems = rpta.length
+    const totalPages = Math.ceil(totalItems / pageSize)
+    let itemL = rpta
+    let itemsAPaginar = itemL.slice(start, end)
+    // Convertir a JSON
+    itemsAPaginar = JSON.stringify(itemsAPaginar)
+
     return res.status(200).json({
         page,
-        totalPages: Math.ceil(response.length / pageSize),
+        totalPages,
         pageSize,
-        totalItems: response.length,
-        items: response
-    });
+        totalItems,
+        items: JSON.parse(itemsAPaginar)
+    }
+    )
+
 });
 
-// Ruta para obtener información detallada de un libro
+//revisar grab para corroborar
+
 ruta.get('/leer', async (req, res) => {
-    // Extraer el ID del libro de la consulta
-    const { id } = req.query;
-    // Realizar consulta a la base de datos con Sequelize
-    const libro = await db.libro.findByPk(id, {
-        include: {
+    let id = req.query.id
+    console.log(id)
+    let libro = await db.libro.findByPk(id, {
+        include : {
             model: db.reserva,
             as: 'reservado',
             attributes: ['id', 'fecha_final'],
             order: [['id', 'DESC']]
         }
-    });
+    })
+    // Calcular si el libro esta disponible o no
+    let rpta = {}
+    let hoy = new Date(obtenerFechaActual())
+        let disponibilidad = true;
+        if (libro.reservado) {
+            
+            libro.reservado.forEach(i => {
+                console.log(" ", i.id, i.fecha_final)
+                if (new Date(i.fecha_final) > hoy) {
+                    disponibilidad = false
+                }
+            })
+            console.log("   Disponible: ", disponibilidad)
+        }
+        rpta = ({ ...libro.get({ plain: true }), disponible: disponibilidad })
+    
+    res.status(200).json(rpta);
 
-    // Procesar los resultados y agregar información adicional
-    const currentDate = new Date();
-    const response = {
-        ...libro.get({ plain: true }),
-        disponible: libro.reservado.some(reserva => new Date(reserva.fecha_final) > currentDate)
-    };
-
-    // Enviar respuesta JSON con la información del libro
-    res.status(200).json(response);
 });
 
-// Ruta para agregar un nuevo libro a la base de datos
 ruta.post('/agregar', async (req, res) => {
-    // Crear un nuevo registro en la base de datos con Sequelize
-    const response = await db.libro.create(req.body);
-    // Enviar respuesta JSON con la información del nuevo libro
-    res.status(200).json(response);
+    let obj = req.body
+    console.log(obj)
+    let rpta = await db.libro.create(obj)
+    res.status(200).json(rpta);
 });
 
-// Ruta para eliminar un libro de la base de datos
 ruta.delete('/eliminar', async (req, res) => {
-    // Extraer el ID del libro de la consulta y realizar la eliminación con Sequelize
-    const { id } = req.query;
-    const response = await db.libro.destroy({ where: { id } });
+    let req_id = req.query.id
+    let rpta = await db.libro.destroy({
+        where: {
+            id: req_id
+        },
+    })
 
-    // Enviar respuesta JSON con el resultado de la eliminación
-    res.status(200).json(response);
+    res.status(200).json(rpta);
 });
 
-// Ruta para modificar un libro en la base de datos
 ruta.put('/modificar', async (req, res) => {
-    // Extraer el ID del libro de la consulta y realizar la modificación con Sequelize
-    const { id } = req.query;
+    const id = req.query.id;
+    const datosModificados = req.body;
+    
     const libro = await db.libro.findByPk(id);
-    await libro.update(req.body);
-    // Enviar respuesta JSON con un mensaje de éxito
-    res.json({ mensaje: 'Libro modificado correctamente' });
+    await libro.update({...datosModificados});
+    return res.json({ mensaje: 'Libro modificado correctamente' });
+
 });
 
-// Ruta para obtener los libros más pedidos con paginación
-ruta.get('/MasPedidos', async (req, res) => {
-    // Extraer el número de página de la consulta y configurar la paginación
-    const { page } = req.query;
-    const pageSize = 2;
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
+ruta.get('/MasPedidos', async (req, res)=>{
+    let obj = req.query
+    let page = obj.page
+    let pageSize = 2
+    let start= (page -1)* pageSize 
+    let end = start + pageSize
 
-    // Realizar consulta a la base de datos con Sequelize
-    const librosPopulares = await db.libro.findAll({
-        where: { contador: { [Op.gt]: 0 } },
-        order: [['contador', 'DESC']],
-    });
+    let libros = await db.libro.findAll({
+        where:{
+            contador:{ [Op.gt]: 0 }
+        },
+        order :[['contador', 'DESC']],
+    })
 
-    // Obtener los libros populares según la paginación
-    const response = librosPopulares.slice(start, end);
+    const totalItems = libros.length
+    const totalPages = Math.ceil(totalItems/pageSize)
+    let itemL = libros
+    let itemsAPaginar = itemL.slice(start,end)
+    itemsAPaginar = JSON.stringify(itemsAPaginar)
+  
+    return res.status(200).json( {
+          page,
+          totalPages,
+          pageSize,
+          totalItems,
+          items: JSON.parse(itemsAPaginar)
+          }
+    )
+})
 
-    // Enviar respuesta JSON con la información paginada de los libros populares
-    res.status(200).json({
-        page,
-        totalPages: Math.ceil(response.length / pageSize),
-        pageSize,
-        totalItems: response.length,
-        items: response
-    });
-});
-
-// Función auxiliar para obtener la fecha actual en el formato deseado
-function getCurrentDate() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+function obtenerFechaActual() {
+    const hoy = new Date();
+    const year = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    return `${year}-${mes}-${dia}`;
 }
-
-// Exportar la ruta para su uso en otras partes de la aplicación
-module.exports = ruta;
+module.exports = ruta
