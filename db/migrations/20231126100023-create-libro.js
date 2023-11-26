@@ -9,16 +9,47 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      nombre: {
+      titulo: {
         type: Sequelize.STRING
+      },
+      autor: {
+        type: Sequelize.STRING
+      },
+      isbn: {
+        type: Sequelize.STRING
+      },
+      editorial: {
+        type: Sequelize.STRING
+      },
+      tipo: {
+        type: Sequelize.STRING
+      },
+      topicos: {
+        type: Sequelize.STRING
+      },
+      descripcion: {
+        type: Sequelize.TEXT
+      },
+      imagen: {
+        type: Sequelize.TEXT
+      },
+      contador: {
+        type: Sequelize.INTEGER,
+        defaultValue : 0
+      },
+      ultimo_reservante: {
+        type: Sequelize.STRING,
+        defaultValue: ''
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date()
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date()
       }
     });
   },

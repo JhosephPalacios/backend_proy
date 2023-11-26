@@ -11,10 +11,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.reserva, {as:'reservado', foreignKey:'libro_id'})
+      this.belongsToMany(models.persona, {through:'reservas', as:'reservacion', foreignKey:'libro_id'})
     }
   }
   libro.init({
-    nombre: DataTypes.STRING
+    titulo: DataTypes.STRING,
+    autor: DataTypes.STRING,
+    isbn: DataTypes.STRING,
+    editorial: DataTypes.STRING,
+    tipo: DataTypes.STRING,
+    topicos: DataTypes.STRING,
+    descripcion: DataTypes.TEXT,
+    imagen: DataTypes.TEXT,
+    contador: DataTypes.INTEGER,
+    ultimo_reservante: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'libro',
