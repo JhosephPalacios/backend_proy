@@ -5,8 +5,8 @@ npx sequelize model:create --name user --attributes name:string  (Name:string es
 npx sequelize db:migrate (Agarra todo los modelos para que se migre y cree la tabla en la base de datos)
 
 Iniciar postgres:
-initdb -U postgres -A password -E utf8 -W -D "C:\Users\Rubenqc\Desktop\BD\DATA"
-pg_ctl -D "C:\Users\Rubenqc\Desktop\BD\DATA" -l "C:\Users\Rubenqc\Desktop\BD\LOG\log.txt" start
+initdb -U postgres -A password -E utf8 -W -D "C:\Users\ruben\OneDrive\Escritorio\backend\DATA"
+pg_ctl -D "C:\Users\ruben\OneDrive\Escritorio\backend\DATA" -l "C:\Users\ruben\OneDrive\Escritorio\backend\LOG\log.txt" start
 psql -U postgres
 
 Para crear, rellenar la base de datos y ejecutar el servidor: 

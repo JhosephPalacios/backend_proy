@@ -4,9 +4,6 @@ const path = require('path');
 
 // require
 const test = require('./api/test')
-const personas = require('./api/personas')
-const libros = require('./api/libros')
-const reservas = require('./api/reservas')
 // -----
 
 const app = express()
@@ -18,9 +15,6 @@ app.use(bodyParser.json({limit: '50mb'}));
 
 // use
 app.use('/api/test',test)
-app.use('/api/personas',personas)
-app.use('/api/libros',libros)
-app.use('/api/reservas',reservas)
 //-----
 
 app.get('/', (req,res) => {
