@@ -37,8 +37,18 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // Puedes agregar el código necesario para revertir los cambios si es necesario
-    // await queryInterface.removeColumn('reservas', 'persona_id');
-    // await queryInterface.removeColumn('reservas', 'libro_id');
+    try {
+      // Elimina la restricción de clave externa en la tabla `reservas`
+      await queryInterface.removeConstraint('reservas', 'reservas_libro_id_fkey');
+  
+      // Ahora elimina las columnas
+      await queryInterface.removeColumn('reservas', 'persona_id');
+      await queryInterface.removeColumn('reservas', 'libro_id');
+  
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
+  
 };

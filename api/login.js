@@ -36,5 +36,29 @@ ruta.post('/validar', async (req, res) => {
       return res.status(500).json({ error: "Error interno del servidor" });
     }
   });
+
+  ruta.get('/obtener-administrador', async (req, res) => {
+    try {
+      const { correo } = req.query;
+  
+      // Buscar en la base de datos si existe un administrador con el correo proporcionado
+      const adminEncontrado = await db.administrador.findOne({
+        where: {
+          correo: correo,
+        },
+      });
+  
+      if (adminEncontrado) {
+        // Devolver los datos del administrador en formato JSON
+        return res.status(200).json(adminEncontrado.toJSON());
+      } else {
+        // No se encontró el administrador en la base de datos
+        return res.status(404).json({ error: 'Administrador no encontrado' });
+      }
+    } catch (error) {
+      console.error("Error al obtener datos del administrador:", error);
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
   
   module.exports = ruta;

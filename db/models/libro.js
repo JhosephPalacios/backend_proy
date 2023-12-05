@@ -10,32 +10,22 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here}
-      this.hasMany(models.reserva, { as: 'reservado', foreignKey: 'libro_id' });
-      this.belongsToMany(models.persona, { through: 'reservas', as: 'reservacion', foreignKey: 'libro_id' });
+      // define association here
+      this.hasMany(models.reserva, {as:'reservado', foreignKey:'libro_id'})
+      this.belongsToMany(models.persona, {through:'reservas', as:'reservacion', foreignKey:'libro_id'})
     }
   }
   libro.init({
-    formato: DataTypes.STRING,
-    autor: DataTypes.STRING,
-    editorial: DataTypes.STRING,
-    categoria: DataTypes.STRING,
-    anio: DataTypes.STRING,
-    idioma: DataTypes.STRING,
-    nro_paginas: DataTypes.STRING,
-    encuadernacion: DataTypes.STRING,
-    isbn: DataTypes.STRING,
-    isbn13: DataTypes.STRING,
-    nro_edicion: DataTypes.STRING,
-    imagen_portada_url: DataTypes.TEXT,
     titulo: DataTypes.STRING,
-    dimensiones: DataTypes.STRING,
-    url_compra: DataTypes.TEXT,
-    tema: DataTypes.STRING,
-    coleccion: DataTypes.STRING,
-    peso: DataTypes.STRING,
-    ilustracion: DataTypes.STRING,
-    diponibilidad_libro: DataTypes.INTEGER
+    autor: DataTypes.STRING,
+    isbn: DataTypes.STRING,
+    editorial: DataTypes.STRING,
+    tipo: DataTypes.STRING,
+    topicos: DataTypes.STRING,
+    descripcion: DataTypes.TEXT,
+    imagen: DataTypes.TEXT,
+    contador: DataTypes.INTEGER,
+    ultimo_reservante: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'libro',
